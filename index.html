@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart SPT Pajak - Sistem Laporan Keuangan Otomatis</title>
+    <title>Smart SPT Pajak - Internal Laporan Keuangan otomatis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -16,23 +16,81 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         /* Paper Effect */
-        .paper-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), inset 0 0 20px rgba(0,0,0,0.02); }
+        .paper-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1), inset 0 0 40px rgba(0,0,0,0.05); }
         .dashed-line { border-bottom: 2px dashed #cbd5e1; }
+        
+        /* Marketing Gradients */
+        .bg-premium { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); color: #5c4506; }
+        .bg-promo { background: linear-gradient(to right, #1e3a8a, #3b82f6); }
+        
+        /* Floating CTA */
+        .floating-cta { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans h-screen flex overflow-hidden">
 
+    <!-- MODAL MARKETING (UPSELL) -->
+    <div id="upsell-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all scale-100 relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-6 h-6"></i></button>
+            
+            <div class="bg-gradient-to-r from-blue-900 to-indigo-800 p-6 text-white text-center">
+                <i data-lucide="file-check" class="w-16 h-16 mx-auto mb-3 text-yellow-400"></i>
+                <h3 class="text-2xl font-bold">Laporan Anda Belum Siap Lapor!</h3>
+                <p class="text-blue-200 text-sm mt-1">Aplikasi ini hanya menghitung angka mentah.</p>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div class="flex items-center gap-3 p-3 bg-red-50 border border-red-100 rounded-lg">
+                    <i data-lucide="x-circle" class="text-red-500 w-6 h-6"></i>
+                    <div class="text-sm">
+                        <span class="font-bold text-gray-800">CSV Biasa (Gratis)</span>
+                        <p class="text-gray-500 text-xs">Hanya angka, tidak ada format PDF resmi, tidak ada Tanda Tangan.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-xl ring-2 ring-yellow-400 relative">
+                    <div class="absolute -top-3 -right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase">Paling Laris</div>
+                    <i data-lucide="star" class="text-yellow-600 w-8 h-8 fill-yellow-500"></i>
+                    <div class="flex-1">
+                        <span class="font-bold text-gray-900 text-lg">Paket Laporan Siap Cetak</span>
+                        <p class="text-gray-600 text-xs mb-2">PDF Resmi DJP + Stempel + Tanda Tangan Digital Otomatis.</p>
+                        <a href="#" class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg font-bold text-sm shadow">
+                            Beli PDF Premium (Rp 49.000)
+                        </a>
+                    </div>
+                </div>
+
+                <div class="text-center pt-2">
+                    <button onclick="realDownload()" class="text-xs text-gray-400 underline hover:text-gray-600">
+                        Tidak terima kasih, saya mau download CSV mentah saja
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SIDEBAR -->
-    <aside class="w-80 bg-slate-900 text-white flex flex-col shadow-2xl z-20 flex-shrink-0">
+    <aside class="w-80 bg-slate-900 text-white flex flex-col shadow-2xl z-20 flex-shrink-0 relative">
         <div class="p-6 border-b border-slate-700 bg-slate-950">
             <h2 class="text-xl font-bold flex items-center gap-2">
-                <i data-lucide="zap" class="text-yellow-400"></i> Smart SPT Pajak
+                <i data-lucide="zap" class="text-yellow-400 fill-yellow-400"></i> Smart SPT Pajak
             </h2>
-            <p class="text-xs text-slate-400 mt-1">Sistem Laporan Keuangan Otomatis</p>
+            <p class="text-xs text-slate-400 mt-1">Internal Laporan Keuangan otomatis</p>
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 space-y-6">
             
+            <!-- SOCIAL HOOK -->
+            <div class="bg-indigo-900/50 p-3 rounded-lg border border-indigo-700 text-center space-y-2">
+                <p class="text-xs text-indigo-200">Dapatkan Tips Pajak Gratis & Update Aplikasi:</p>
+                <div class="flex justify-center gap-2">
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition"><i data-lucide="youtube" class="w-3 h-3"></i> Subscribe</button>
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1 transition"><i data-lucide="instagram" class="w-3 h-3"></i> Follow</button>
+                </div>
+            </div>
+
             <!-- NERACA MONITOR -->
             <div id="balance-monitor" class="bg-slate-800 p-4 rounded-xl border border-slate-700">
                 <p class="text-[10px] uppercase font-bold text-slate-400 mb-2">Status Neraca (L1)</p>
@@ -53,46 +111,65 @@
             </div>
 
             <!-- TAX MONITOR -->
-            <div class="bg-gradient-to-br from-blue-900 to-slate-900 p-4 rounded-xl border border-blue-800 shadow-lg">
+            <div class="bg-gradient-to-br from-blue-900 to-slate-900 p-4 rounded-xl border border-blue-800 shadow-lg relative overflow-hidden group cursor-pointer">
+                <div class="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-bold px-2 py-0.5 rounded-bl">PRO FEATURE</div>
                 <p class="text-xs text-blue-200 mb-1">Estimasi Bayar Pajaknya</p>
-                <div class="text-2xl font-mono font-bold text-white tracking-tighter" id="live-tax">Rp 0</div>
+                <div class="text-2xl font-mono font-bold text-white tracking-tighter group-hover:text-yellow-300 transition" id="live-tax">Rp 0</div>
                 <div class="mt-2 pt-2 border-t border-blue-800/50 flex justify-between text-[10px] text-blue-300">
                     <span>Skema:</span>
                     <span id="active-scheme-label" class="font-bold text-white">-</span>
                 </div>
+                <!-- Tooltip Hook -->
+                <div class="hidden group-hover:block absolute inset-0 bg-black/80 flex items-center justify-center text-center p-2 text-xs text-white">
+                    Ingin kurangi bayar pajak legal? <br><span class="text-yellow-400 underline">Konsultasi Denda</span>
+                </div>
             </div>
 
-            <!-- NAV -->
-            <nav class="space-y-1">
-                <a href="#section-1" class="nav-item flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-sm text-slate-300">
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> 1. Profil & Tarif Berlaku
+            <!-- ECOSYSTEM LINKS (The Long Game) -->
+            <div class="space-y-1 pt-4 border-t border-slate-800">
+                <p class="text-[10px] text-slate-500 uppercase font-bold px-2 mb-1">Aplikasi Kami Lainnya</p>
+                <a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-slate-800 text-[11px] text-slate-400 transition">
+                    <i data-lucide="pen-tool" class="w-3 h-3 text-purple-400"></i> Stempel & TTD Otomatis
                 </a>
-                <a href="#section-2" class="nav-item flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-sm text-slate-300">
-                    <span class="w-2 h-2 rounded-full bg-slate-600"></span> 2. Laba Rugi & Fiskal setahun ini
+                <a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-slate-800 text-[11px] text-slate-400 transition">
+                    <i data-lucide="home" class="w-3 h-3 text-orange-400"></i> Notaris Tanah & Properti
                 </a>
-                <a href="#section-neraca" class="nav-item flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-sm text-slate-300">
-                    <span class="w-2 h-2 rounded-full bg-slate-600"></span> 3. NERACA (Kesehatan keuangan)
+                <a href="#" class="flex items-center gap-2 p-2 rounded hover:bg-slate-800 text-[11px] text-slate-400 transition">
+                    <i data-lucide="gift" class="w-3 h-3 text-pink-400"></i> Kalkulator Hibah
                 </a>
-                <a href="#section-4" class="nav-item flex items-center gap-3 p-2 rounded hover:bg-slate-800 text-xs text-slate-300">
-                    <span class="w-2 h-2 rounded-full bg-slate-600 flex-shrink-0"></span> 4. Kredit Yg pernah bayar/diPotong jd pengurang pjk
-                </a>
-            </nav>
+            </div>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-full relative bg-gray-100">
         <header class="bg-white p-4 border-b flex justify-between items-center px-8 shadow-sm z-10 sticky top-0">
-            <h1 class="font-bold text-xl text-gray-800">Input Data SPT Tahunan</h1>
-            <button onclick="downloadCSV()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow transition transform hover:scale-105">
+            <h1 class="font-bold text-xl text-gray-800 flex items-center gap-2">
+                Menghitung SPT Tahunan
+                <span class="bg-green-100 text-green-800 text-[10px] px-2 py-0.5 rounded-full border border-green-200">Versi Gratis</span>
+            </h1>
+            <button onclick="triggerUpsell()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-lg transition-all transform hover:scale-105 floating-cta">
                 <i data-lucide="save"></i> Simpan & Download
             </button>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-8 pb-40 space-y-8 scroll-smooth" id="main-scroll">
+        <div class="flex-1 overflow-y-auto p-8 pb-40 space-y-10 scroll-smooth" id="main-scroll">
             
+            <!-- MARKETING BANNER 1 -->
+            <div class="bg-promo text-white p-4 rounded-xl shadow-md flex justify-between items-center transform transition hover:scale-[1.01] cursor-pointer">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-lg"><i data-lucide="help-circle" class="w-6 h-6"></i></div>
+                    <div>
+                        <h4 class="font-bold text-sm">Bingung Pilih Tarif UMKM 0,5% atau Tarif Umum?</h4>
+                        <p class="text-xs text-blue-100">Salah pilih bisa kena denda. Gunakan Jasa Penetapan Tarif kami.</p>
+                    </div>
+                </div>
+                <button class="bg-white text-blue-800 px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-50">Konsultasi</button>
+            </div>
+
             <!-- 1. PROFIL & TARIF -->
-            <section id="section-1" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <section id="section-1" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-gray-100 px-3 py-1 text-[10px] text-gray-500 font-mono rounded-bl-lg">Step 1 of 4</div>
                 <h3 class="font-bold text-gray-700 mb-4 border-b pb-2">1. Profil & Tarif Berlaku</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
                     <div>
@@ -112,8 +189,10 @@
                         <input type="number" id="inp-reg-year" class="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 outline-none" value="2023" onkeyup="runEngine()">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 text-blue-600">Pendapatan Setahun (OMZET Bruto)</label>
-                        <input type="text" id="inp-omzet" class="currency-input w-full p-3 border-2 border-yellow-400 bg-yellow-50 rounded text-right focus:border-yellow-600 focus:bg-yellow-100 outline-none transition-colors" placeholder="0" onkeyup="formatAndReact(this)">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1 text-blue-600 flex items-center gap-1">
+                            Pendapatan Setahun (OMZET Bruto) <i data-lucide="star" class="w-3 h-3 text-yellow-500 fill-current"></i>
+                        </label>
+                        <input type="text" id="inp-omzet" class="currency-input w-full p-3 border-2 border-yellow-400 bg-yellow-50 rounded text-right focus:border-yellow-600 focus:bg-yellow-100 outline-none transition-colors text-lg" placeholder="0" onkeyup="formatAndReact(this)">
                     </div>
                 </div>
                 
@@ -143,43 +222,51 @@
                 </div>
             </section>
 
-            <!-- 2. LABA RUGI -->
-            <section id="section-2" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 transition-all">
-                <h3 class="font-bold text-gray-700 mb-4 border-b pb-2 flex justify-between">
+            <!-- 2. LABA RUGI (EYE CATCHING BACKGROUND) -->
+            <section id="section-2" class="bg-gradient-to-br from-indigo-600 to-blue-700 p-8 rounded-2xl shadow-2xl border-none transition-all relative">
+                <!-- Watermark Marketing -->
+                <div class="absolute top-4 right-4 text-white/10 font-bold text-6xl pointer-events-none select-none">PREVIEW</div>
+                
+                <h3 class="font-bold text-white mb-6 border-b border-indigo-400 pb-2 flex justify-between items-center">
                     <span>2. Laba Rugi & Fiskal setahun ini</span>
-                    <span id="badge-laba" class="text-xs bg-gray-100 px-2 py-1 rounded">Netto: Rp 0</span>
+                    <span id="badge-laba" class="text-xs bg-indigo-800/50 px-3 py-1 rounded border border-indigo-400 text-indigo-100">Netto: Rp 0</span>
                 </h3>
                 
-                <!-- INPUT FORM -->
-                <div id="form-laba" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">HP.Pokok BYR Keluar</label>
-                        <input type="text" id="inp-hpp" class="currency-input w-full p-3 border rounded text-right focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0" onkeyup="formatAndReact(this)">
-                        <p class="text-[10px] text-blue-500 mt-1 italic"><i data-lucide="info" class="w-3 h-3 inline"></i> Estimasi wajar: 79% dari Omzet</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">PengGAJIan/upah</label>
-                        <input type="text" id="inp-gaji" class="currency-input w-full p-3 border rounded text-right focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0" onkeyup="formatAndReact(this)">
-                        <p class="text-[10px] text-blue-500 mt-1 italic"><i data-lucide="info" class="w-3 h-3 inline"></i> Estimasi wajar: 10% dari Omzet</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Biaya Lainnya</label>
-                        <input type="text" id="inp-biaya" class="currency-input w-full p-3 border rounded text-right focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0" onkeyup="formatAndReact(this)">
-                        <p class="text-[10px] text-blue-500 mt-1 italic"><i data-lucide="info" class="w-3 h-3 inline"></i> Estimasi wajar: 5% dari Omzet</p>
-                    </div>
-                    <div></div> <!-- Spacer -->
-                    <div>
-                        <label class="block text-xs font-bold text-red-500 uppercase mb-1">Evaluasi Positif (+)</label>
-                        <input type="text" id="inp-kor-pos" class="currency-input w-full p-3 border border-red-100 rounded text-right focus:ring-2 focus:ring-red-500 outline-none" placeholder="0" onkeyup="formatAndReact(this)">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-green-500 uppercase mb-1">Evaluasi Negatif (-)</label>
-                        <input type="text" id="inp-kor-neg" class="currency-input w-full p-3 border border-green-100 rounded text-right focus:ring-2 focus:ring-green-500 outline-none" placeholder="0" onkeyup="formatAndReact(this)">
+                <!-- INPUT FORM (Wrapper White for Readability) -->
+                <div class="bg-white/10 p-6 rounded-xl backdrop-blur-sm border border-white/20 mb-8">
+                    <div id="form-laba" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold text-blue-100 uppercase mb-1">HP.Pokok BYR Keluar</label>
+                            <input type="text" id="inp-hpp" class="currency-input w-full p-3 border-none rounded text-right focus:ring-2 focus:ring-yellow-400 outline-none shadow-inner bg-white/90" placeholder="0" onkeyup="formatAndReact(this)">
+                            <p class="text-[10px] text-blue-200 mt-1 italic flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Estimasi wajar: 79% dari Omzet</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-blue-100 uppercase mb-1">PengGAJIan/upah</label>
+                            <input type="text" id="inp-gaji" class="currency-input w-full p-3 border-none rounded text-right focus:ring-2 focus:ring-yellow-400 outline-none shadow-inner bg-white/90" placeholder="0" onkeyup="formatAndReact(this)">
+                            <p class="text-[10px] text-blue-200 mt-1 italic flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Estimasi wajar: 10% dari Omzet</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-blue-100 uppercase mb-1">Biaya Lainnya</label>
+                            <input type="text" id="inp-biaya" class="currency-input w-full p-3 border-none rounded text-right focus:ring-2 focus:ring-yellow-400 outline-none shadow-inner bg-white/90" placeholder="0" onkeyup="formatAndReact(this)">
+                            <p class="text-[10px] text-blue-200 mt-1 italic flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Estimasi wajar: 5% dari Omzet</p>
+                        </div>
+                        <div></div> <!-- Spacer -->
+                        <div>
+                            <label class="block text-xs font-bold text-red-300 uppercase mb-1">Evaluasi Positif (+)</label>
+                            <input type="text" id="inp-kor-pos" class="currency-input w-full p-3 border-none rounded text-right focus:ring-2 focus:ring-red-400 outline-none shadow-inner bg-white/90" placeholder="0" onkeyup="formatAndReact(this)">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-green-300 uppercase mb-1">Evaluasi Negatif (-)</label>
+                            <input type="text" id="inp-kor-neg" class="currency-input w-full p-3 border-none rounded text-right focus:ring-2 focus:ring-green-400 outline-none shadow-inner bg-white/90" placeholder="0" onkeyup="formatAndReact(this)">
+                        </div>
                     </div>
                 </div>
 
-                <!-- PREVIEW LAPORAN LABA RUGI (PAPER EFFECT) -->
-                <div class="relative bg-white paper-shadow border border-slate-100 p-8 rounded-sm max-w-2xl mx-auto">
+                <!-- PREVIEW LAPORAN LABA RUGI (PAPER EFFECT - POP OUT) -->
+                <div class="relative bg-white paper-shadow border-none p-8 rounded-sm max-w-2xl mx-auto transform hover:scale-[1.01] transition-transform duration-500 group">
+                    <!-- Premium Badge on Paper -->
+                    <div class="absolute -right-2 -top-2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-3 py-1 shadow-md transform rotate-12 group-hover:scale-110 transition">CONTOH PDF PREMIUM</div>
+                    
                     <!-- Paper Header -->
                     <div class="text-center mb-6 border-b-2 border-double border-slate-800 pb-2">
                         <h4 class="font-serif font-bold text-lg text-slate-800">LAPORAN LABA RUGI</h4>
@@ -233,9 +320,27 @@
                                 <span id="prev-pph">0</span>
                             </div>
                         </div>
+                        
+                        <!-- Marketing Footer in Paper -->
+                        <div class="mt-6 pt-4 border-t border-slate-200 text-center">
+                            <p class="text-[10px] text-slate-400 italic">Ingin cetak laporan rapi seperti ini lengkap dengan tanda tangan digital?</p>
+                            <button onclick="triggerUpsell()" class="mt-1 text-blue-600 text-xs font-bold underline hover:text-blue-800">Download Versi Cetak Premium &rarr;</button>
+                        </div>
                     </div>
                 </div>
             </section>
+
+            <!-- MARKETING BANNER 2 -->
+            <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-4 rounded-xl shadow-md flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/10 p-2 rounded-lg"><i data-lucide="file-warning" class="w-6 h-6 text-red-400"></i></div>
+                    <div>
+                        <h4 class="font-bold text-sm">Punya Denda Pajak Menumpuk?</h4>
+                        <p class="text-xs text-gray-400">Jangan biarkan aset disita. Kami bantu proses penghapusan/pengurangan denda.</p>
+                    </div>
+                </div>
+                <button class="bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700 shadow shadow-red-500/50">Cek Solusi</button>
+            </div>
 
             <!-- 3. NERACA (BALANCE SHEET) -->
             <section id="section-neraca" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
@@ -253,9 +358,9 @@
                 <!-- CATATAN REKOMENDASI NERACA -->
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r-lg">
                     <div class="flex items-start">
-                        <i data-lucide="info" class="w-5 h-5 text-blue-500 mr-2 mt-0.5"></i>
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-blue-500 mr-2 mt-0.5"></i>
                         <div>
-                            <p class="text-xs font-bold text-blue-800 mb-1">Strategi planning Keuangan</p>
+                            <p class="text-xs font-bold text-blue-800 mb-1 italic">Strategi planning Keuangan</p>
                             <p class="text-xs text-blue-700 leading-relaxed" id="neraca-recommendation">
                                 Menunggu data...
                             </p>
@@ -310,7 +415,7 @@
             </section>
 
             <!-- 4. KREDIT PAJAK -->
-            <section id="section-4" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <section id="section-4" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mt-8">
                 <h3 class="font-bold text-gray-700 mb-4 border-b pb-2">4. Kredit Yg pernah bayar/diPotong jd pengurang pjk</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -325,7 +430,7 @@
             </section>
 
             <!-- 5. FINAL SUMMARY -->
-            <section id="section-summary" class="bg-slate-800 text-white p-6 rounded-xl shadow-lg border border-slate-700">
+            <section id="section-summary" class="bg-slate-800 text-white p-6 rounded-xl shadow-lg border border-slate-700 mt-8">
                 <div class="flex justify-between items-end mb-6">
                     <h3 class="font-bold text-xl flex items-center gap-2">
                         <i data-lucide="file-check" class="text-yellow-400"></i> Ringkasan Induk
@@ -360,6 +465,23 @@
         // UTILS
         const parse = (val) => parseFloat(val?.replace(/\./g, '').replace(/,/g, '') || 0);
         const format = (num) => num.toLocaleString('id-ID');
+
+        // Modal Logic
+        function triggerUpsell() {
+            document.getElementById('upsell-modal').classList.remove('hidden');
+        }
+        function closeModal() {
+            document.getElementById('upsell-modal').classList.add('hidden');
+        }
+        function realDownload() {
+            const badgeText = document.getElementById('balance-badge').innerText;
+            if (badgeText.includes("SELISIH")) {
+                alert("PERINGATAN: Neraca tidak seimbang. Mohon perbaiki data aset/kewajiban sebelum download.");
+                return;
+            }
+            alert("Sedang mengunduh file CSV basic...");
+            closeModal();
+        }
 
         function formatAndReact(el) {
             let original = el.value.replace(/\D/g, '');
@@ -439,15 +561,14 @@
                     schemeLabel = "Tarif Umum";
                 }
                 else if (omzet <= 4800000000) {
-                    // Fasilitas 31E Full (11% on PKP)
                     tax = Math.floor(pkp * 0.11);
                     tarifDisplay = "Pasal 31E 11%";
                     schemeLabel = "Pasal 31E 11%";
                 }
                 else if (omzet > 50000000000) {
                     tax = Math.floor(pkp * 0.22);
-                    tarifDisplay = "Tarif Normal 22%";
-                    schemeLabel = "Tarif Normal 22%";
+                    tarifDisplay = "Tarif Normal 22% (Pasal 17)";
+                    schemeLabel = "Tarif Normal 22% (Pasal 17)";
                 }
                 else {
                     let pkpFas = (4800000000 / omzet) * pkp;
@@ -591,15 +712,6 @@
             if(balance > 0) { elStat.innerText = "KURANG BAYAR"; elStat.className = "text-2xl font-extrabold text-red-400"; }
             else if(balance < 0) { elStat.innerText = "LEBIH BAYAR"; elStat.className = "text-2xl font-extrabold text-yellow-400"; }
             else { elStat.innerText = "NIHIL"; elStat.className = "text-2xl font-extrabold text-gray-400"; }
-        }
-
-        function downloadCSV() {
-            const badgeText = document.getElementById('balance-badge').innerText;
-            if (badgeText.includes("SELISIH")) {
-                alert("PERINGATAN: Neraca tidak seimbang. Mohon perbaiki data aset/kewajiban sebelum download.");
-                return;
-            }
-            alert("Generating CSV L1 (Laba Rugi & Neraca), Induk, dan Kredit Pajak...");
         }
 
         runEngine();
